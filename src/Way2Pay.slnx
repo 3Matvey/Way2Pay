@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Orchestrator/">
+    <Project Path="Orchestrator/Way2Pay.Orchestrator.Api/Way2Pay.Orchestrator.Api.csproj" />
+    <Project Path="Orchestrator/Way2Pay.Orchestrator.Core/Way2Pay.Orchestrator.Core.csproj" />
+    <Project Path="Orchestrator/Way2Pay.Orchestrator.Database/Way2Pay.Orchestrator.Database.sqlproj" Id="f8f5bc8b-c620-4850-99d4-e0fbb12e05eb">
+      <Build />
+      <Deploy />
+    </Project>
+    <Project Path="Orchestrator/Way2Pay.Orchestrator.Infrastructure/Way2Pay.Orchestrator.Infrastructure.csproj" Id="cf819436-86ef-4c47-b823-3ba43e691ca0" />
+  </Folder>
+  <Project Path="Way2Pay.AppHost/Way2Pay.AppHost.csproj" Id="f70f8728-7a77-4487-8914-5b17b091211d" />
+  <Project Path="Way2Pay.ServiceDefaults/Way2Pay.ServiceDefaults.csproj" />
+</Solution>

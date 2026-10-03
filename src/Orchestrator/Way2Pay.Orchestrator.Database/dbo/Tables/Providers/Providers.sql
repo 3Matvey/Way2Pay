@@ -1,0 +1,8 @@
+CREATE TABLE dbo.providers
+(
+    id          UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+    code        NVARCHAR(50) NOT NULL UNIQUE,
+    name        NVARCHAR(100) NOT NULL,
+    status      NVARCHAR(30) NOT NULL,
+    created_at  DATETIME2(7) NOT NULL DEFAULT SYSUTCDATETIME()
+);

@@ -1,0 +1,5 @@
+CREATE TABLE dbo.countries
+(
+    code NVARCHAR(2) NOT NULL PRIMARY KEY,
+    name NVARCHAR(100) NOT NULL
+);
