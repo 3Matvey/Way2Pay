@@ -22,3 +22,5 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+
+req.md

@@ -1,6 +1,15 @@
 @Way2Pay.Orchestrator.Api_HostAddress = http://localhost:5252
 
-GET {{Way2Pay.Orchestrator.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{Way2Pay.Orchestrator.Api_HostAddress}}/payments
+Content-Type: application/json
+Idempotency-Key: demo-payment-001
+
+{
+  "externalPaymentId": "order-001",
+  "amount": 100.00,
+  "currencyCode": "BYN",
+  "countryCode": "BY",
+  "description": "Test payment"
+}
 
 ###
