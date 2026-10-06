@@ -9,8 +9,4 @@
     <UserSecretsId>886aef6f-7e2f-4678-9ef8-5e6618c534ea</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Orchestrator\Way2Pay.Orchestrator.Api\Way2Pay.Orchestrator.Api.csproj" />
-  </ItemGroup>
-
 </Project>

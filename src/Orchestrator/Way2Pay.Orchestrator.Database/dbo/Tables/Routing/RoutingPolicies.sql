@@ -1,9 +1,0 @@
-CREATE TABLE dbo.routing_policies
-(
-    id          UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-    name        NVARCHAR(150) NOT NULL,
-    description NVARCHAR(MAX) NULL,
-    is_active   BIT NOT NULL DEFAULT 1,
-    created_at  DATETIME2(7) NOT NULL DEFAULT SYSUTCDATETIME(),
-    updated_at  DATETIME2(7) NOT NULL DEFAULT SYSUTCDATETIME()
-);

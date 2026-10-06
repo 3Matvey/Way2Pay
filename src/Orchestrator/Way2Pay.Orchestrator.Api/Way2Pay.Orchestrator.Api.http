@@ -1,6 +1,0 @@
-@Way2Pay.Orchestrator.Api_HostAddress = http://localhost:5252
-
-GET {{Way2Pay.Orchestrator.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
