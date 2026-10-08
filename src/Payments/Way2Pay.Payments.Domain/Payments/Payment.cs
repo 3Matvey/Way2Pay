@@ -86,9 +86,9 @@ public sealed class Payment : AuditableEntity
         ArgumentNullException.ThrowIfNull(amount);
         Guard.Positive(amount.Amount);
         if (amount.Currency != Currency)
-            throw new InvalidOperationException("The operation must use the payment currency.");
+            throw new PaymentOperationNotAllowedException("The operation must use the payment currency.");
         if (!CanStartOperation(type, amount))
-            throw new InvalidOperationException("The operation or amount is not allowed for the current payment state.");
+            throw new PaymentOperationNotAllowedException("The operation or amount is not allowed for the current payment state.");
     }
 
     private bool CanStartOperation(PaymentOperationType type, Money amount) 
@@ -186,6 +186,6 @@ public sealed class Payment : AuditableEntity
     private void EnsureNoActiveOperation()
     {
         if (_operations.Any(o => o.Status is PaymentOperationStatus.Pending or PaymentOperationStatus.Processing or PaymentOperationStatus.Unknown))
-            throw new InvalidOperationException("The previous operation must be resolved before starting another one.");
+            throw new PaymentOperationNotAllowedException("The previous operation must be resolved before starting another one.");
     }
 }

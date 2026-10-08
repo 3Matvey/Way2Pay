@@ -29,21 +29,7 @@ public sealed class CreatePaymentUseCase(
             return PaymentErrors.InvalidMerchantId();
         if (string.IsNullOrWhiteSpace(request.IdempotencyKey))
             return PaymentErrors.InvalidIdempotencyKey();
-        return CreateAmount(request.Amount, request.Currency);
-    }
-
-    private static Result<Money> CreateAmount(decimal amount, string currency)
-    {
-        if (amount <= 0)
-            return PaymentErrors.InvalidAmount();
-        try
-        {
-            return new Money(amount, new CurrencyCode(currency));
-        }
-        catch (ArgumentException)
-        {
-            return PaymentErrors.InvalidCurrency();
-        }
+        return PaymentAmountFactory.Create(request.Amount, request.Currency);
     }
 
     private async Task<Result<CreatePaymentResponse>> CreateOrReplayAsync(
@@ -60,7 +46,7 @@ public sealed class CreatePaymentUseCase(
         CreatePaymentRequest request, Money amount, CancellationToken cancellationToken)
     {
         var payment = new Payment(request.MerchantId, amount);
-        await paymentRepository.AddAsync(payment, cancellationToken);
+        paymentRepository.Add(payment);
         paymentCreationStore.Add(new PaymentCreationRecord(
             request.MerchantId, request.IdempotencyKey, amount, payment.Id));
         return await SaveAsync(request, payment, cancellationToken);
