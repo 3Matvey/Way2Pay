@@ -12,17 +12,21 @@ public sealed class Payment : AuditableEntity
 
     public Guid MerchantId { get; private set; }
     public Money Amount { get; }
+    /// <summary>The payment-method snapshot assigned when the payment is created.</summary>
+    public PaymentMethod PaymentMethod { get; }
     public CurrencyCode Currency => Amount.Currency;
     public PaymentStatus Status { get; private set; }
     public PaymentBalance Balance { get; }
     public IReadOnlyList<PaymentOperation> Operations => _operations.AsReadOnly();
 
-    public Payment(Guid merchantId, Money amount)
+    public Payment(Guid merchantId, Money amount, PaymentMethod paymentMethod)
     {
         ArgumentNullException.ThrowIfNull(amount);
+        ArgumentNullException.ThrowIfNull(paymentMethod);
         Guard.Positive(amount.Amount);
         MerchantId = Guard.RequiredId(merchantId);
         Amount = amount;
+        PaymentMethod = paymentMethod;
         Balance = new PaymentBalance(Currency);
         Status = PaymentStatus.Created;
     }
@@ -36,12 +40,16 @@ public sealed class Payment : AuditableEntity
         return operation;
     }
 
+    /// <summary>Creates an operation attempt through an eligible provider account.</summary>
+    /// <remarks>
+    /// Authorize and Charge require a payment-method binding to the selected account.
+    /// Capture, Void and Refund use the account of the original successful operation.
+    /// Application checks account availability and the merchant permission to use it.
+    /// </remarks>
     public PaymentAttempt StartAttempt(Guid operationId, Guid providerAccountId)
     {
         var operation = GetActiveOperation(operationId);
-        if (operation.Type is not (PaymentOperationType.Authorize or PaymentOperationType.Charge)
-            && GetOriginalAttempt(operation.Type)?.ProviderAccountId != providerAccountId)
-            throw new InvalidOperationException("Follow-up operations must use the original provider account.");
+        EnsureProviderAccountAllowed(operation, providerAccountId);
 
         return operation.StartAttempt(providerAccountId);
     }
@@ -65,10 +73,15 @@ public sealed class Payment : AuditableEntity
         operation.ResumeAfterConfirmedFailure();
     }
 
-    public void MarkAttemptUnknown(Guid operationId, Guid attemptId)
+    /// <summary>Marks the current attempt as unknown and blocks new attempts until its outcome is resolved.</summary>
+    /// <param name="operationId">An operation belonging to this payment.</param>
+    /// <param name="attemptId">The current attempt of the operation.</param>
+    /// <param name="providerTransactionId">The transaction identifier, if already supplied by the provider.</param>
+    /// <remarks>Monetary balances remain unchanged. The attempt and operation remain incomplete.</remarks>
+    public void MarkAttemptUnknown(Guid operationId, Guid attemptId, string? providerTransactionId = null)
     {
         var operation = GetActiveOperation(operationId);
-        operation.GetCurrentAttempt(attemptId).MarkUnknown();
+        operation.GetCurrentAttempt(attemptId).MarkUnknown(providerTransactionId);
         operation.MarkUnknown();
     }
 
@@ -79,6 +92,15 @@ public sealed class Payment : AuditableEntity
         operation.Fail(now);
         if (operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge)
             Status = PaymentStatus.Failed;
+    }
+
+    private void EnsureProviderAccountAllowed(PaymentOperation operation, Guid providerAccountId)
+    {
+        var allowed = operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge
+            ? PaymentMethod.ProviderReferences.Any(reference => reference.ProviderAccountId == providerAccountId)
+            : GetOriginalAttempt(operation.Type)?.ProviderAccountId == providerAccountId;
+        if (!allowed)
+            throw new InvalidOperationException("The provider account is not allowed for this operation.");
     }
 
     private void EnsureOperationAllowed(PaymentOperationType type, Money amount)

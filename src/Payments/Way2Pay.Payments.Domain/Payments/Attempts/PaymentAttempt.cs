@@ -9,6 +9,8 @@ public sealed class PaymentAttempt : AuditableEntity
     public Guid ProviderAccountId { get; private set; }
     public int Number { get; private set; }
     public PaymentAttemptStatus Status { get; private set; }
+    /// <summary>The provider transaction identifier, which may be known before the final outcome.</summary>
+    /// <remarks>Recorded on success or Unknown and never replaced with a different ID within the attempt.</remarks>
     public string? ProviderTransactionId { get; private set; }
     public string? FailureCode { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
@@ -27,7 +29,7 @@ public sealed class PaymentAttempt : AuditableEntity
     internal void Succeed(string providerTransactionId, DateTimeOffset now)
     {
         EnsureUnresolved();
-        ProviderTransactionId = Guard.Required(providerTransactionId);
+        RecordProviderTransactionId(providerTransactionId);
         Status = PaymentAttemptStatus.Succeeded;
         CompletedAt = now;
     }
@@ -42,12 +44,26 @@ public sealed class PaymentAttempt : AuditableEntity
         CompletedAt = now;
     }
 
-    internal void MarkUnknown()
+    /// <summary>Marks a processing attempt as Unknown and records the known transaction ID.</summary>
+    /// <param name="providerTransactionId">An optional transaction ID; null means the provider has not supplied one.</param>
+    /// <remarks>CompletedAt remains unset because the monetary outcome has not been established.</remarks>
+    internal void MarkUnknown(string? providerTransactionId)
     {
         if (Status != PaymentAttemptStatus.Processing)
             throw new InvalidOperationException("Only a processing attempt can become unknown.");
 
+        if (providerTransactionId is not null)
+            RecordProviderTransactionId(providerTransactionId);
         Status = PaymentAttemptStatus.Unknown;
+    }
+
+    /// <summary>Binds the transaction ID to the attempt so a later result cannot substitute a different transaction.</summary>
+    private void RecordProviderTransactionId(string transactionId)
+    {
+        Guard.Required(transactionId);
+        if (ProviderTransactionId is not null && ProviderTransactionId != transactionId)
+            throw new InvalidOperationException("The provider transaction identifier cannot change within an attempt.");
+        ProviderTransactionId = transactionId;
     }
 
     private void EnsureUnresolved()

@@ -7,6 +7,9 @@ public static class PaymentErrors
     public static Error InvalidMerchantId() =>
         Error.BadRequest("Payments.InvalidMerchantId", "A merchant identifier is required.");
 
+    public static Error InvalidPaymentMethod() =>
+        Error.BadRequest("Payments.InvalidPaymentMethod", "A payment method is required.");
+
     public static Error InvalidAmount() =>
         Error.BadRequest("Payments.InvalidAmount", "The payment amount must be positive.");
 

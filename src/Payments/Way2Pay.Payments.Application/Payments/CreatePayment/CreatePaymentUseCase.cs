@@ -29,6 +29,8 @@ public sealed class CreatePaymentUseCase(
             return PaymentErrors.InvalidMerchantId();
         if (string.IsNullOrWhiteSpace(request.IdempotencyKey))
             return PaymentErrors.InvalidIdempotencyKey();
+        if (request.PaymentMethod is null)
+            return PaymentErrors.InvalidPaymentMethod();
         return PaymentAmountFactory.Create(request.Amount, request.Currency);
     }
 
@@ -38,17 +40,17 @@ public sealed class CreatePaymentUseCase(
         var record = await paymentCreationStore.FindAsync(
             request.MerchantId, request.IdempotencyKey, cancellationToken);
         if (record is not null)
-            return Replay(record, amount);
+            return Replay(record, amount, request.PaymentMethod);
         return await CreateAsync(request, amount, cancellationToken);
     }
 
     private async Task<Result<CreatePaymentResponse>> CreateAsync(
         CreatePaymentRequest request, Money amount, CancellationToken cancellationToken)
     {
-        var payment = new Payment(request.MerchantId, amount);
+        var payment = new Payment(request.MerchantId, amount, request.PaymentMethod);
         paymentRepository.Add(payment);
         paymentCreationStore.Add(new PaymentCreationRecord(
-            request.MerchantId, request.IdempotencyKey, amount, payment.Id));
+            request.MerchantId, request.IdempotencyKey, amount, payment.Id, request.PaymentMethod));
         return await SaveAsync(request, payment, cancellationToken);
     }
 
@@ -73,12 +75,13 @@ public sealed class CreatePaymentUseCase(
         var record = await paymentCreationStore.FindAsync(
             request.MerchantId, request.IdempotencyKey, cancellationToken)
             ?? throw new InvalidOperationException("The conflicting committed payment creation was not found.");
-        return Replay(record, amount);
+        return Replay(record, amount, request.PaymentMethod);
     }
 
-    private static Result<CreatePaymentResponse> Replay(PaymentCreationRecord record, Money amount)
+    private static Result<CreatePaymentResponse> Replay(
+        PaymentCreationRecord record, Money amount, PaymentMethod paymentMethod)
     {
-        if (record.Amount != amount)
+        if (record.Amount != amount || record.PaymentMethod != paymentMethod)
             return PaymentErrors.IdempotencyConflict();
         return new CreatePaymentResponse(record.PaymentId, PaymentStatus.Created);
     }
