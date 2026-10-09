@@ -66,10 +66,12 @@ public sealed class Payment : AuditableEntity
     }
 
     /// <summary>Records a verified failure with no monetary effect. A timeout is not such evidence.</summary>
-    public void RecordAttemptFailure(Guid operationId, Guid attemptId, string failureCode, DateTimeOffset now)
+    /// <remarks>An optional provider transaction ID is retained even though no monetary action occurred.</remarks>
+    public void RecordAttemptFailure(
+        Guid operationId, Guid attemptId, string failureCode, DateTimeOffset now, string? providerTransactionId = null)
     {
         var operation = GetActiveOperation(operationId);
-        operation.GetCurrentAttempt(attemptId).Fail(failureCode, now);
+        operation.GetCurrentAttempt(attemptId).Fail(failureCode, now, providerTransactionId);
         operation.ResumeAfterConfirmedFailure();
     }
 

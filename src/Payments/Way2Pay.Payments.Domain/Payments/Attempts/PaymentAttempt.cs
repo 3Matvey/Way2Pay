@@ -10,7 +10,7 @@ public sealed class PaymentAttempt : AuditableEntity
     public int Number { get; private set; }
     public PaymentAttemptStatus Status { get; private set; }
     /// <summary>The provider transaction identifier, which may be known before the final outcome.</summary>
-    /// <remarks>Recorded on success or Unknown and never replaced with a different ID within the attempt.</remarks>
+    /// <remarks>Recorded on success, confirmed failure or Unknown and never replaced with a different ID within the attempt.</remarks>
     public string? ProviderTransactionId { get; private set; }
     public string? FailureCode { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
@@ -34,12 +34,15 @@ public sealed class PaymentAttempt : AuditableEntity
         CompletedAt = now;
     }
 
-    // Failure means definitive evidence that the operation was not performed.
-    // Transport errors alone must be recorded as Unknown instead.
-    internal void Fail(string failureCode, DateTimeOffset now)
+    /// <summary>Records a confirmed failure without monetary effect and retains any supplied transaction ID.</summary>
+    /// <remarks>Transport errors alone must be recorded as Unknown. An omitted ID preserves any previously recorded ID.</remarks>
+    internal void Fail(string failureCode, DateTimeOffset now, string? providerTransactionId = null)
     {
         EnsureUnresolved();
-        FailureCode = Guard.Required(failureCode);
+        Guard.Required(failureCode);
+        if (providerTransactionId is not null)
+            RecordProviderTransactionId(providerTransactionId);
+        FailureCode = failureCode;
         Status = PaymentAttemptStatus.Failed;
         CompletedAt = now;
     }
