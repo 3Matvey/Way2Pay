@@ -5,7 +5,8 @@ namespace Way2Pay.Payments.Application.Payments;
 public interface IPaymentRepository
 {
     /// <summary>
-    /// Loads a payment owned by the merchant, including operations and attempts ordered by Number.
+    /// Loads a payment owned by the merchant, including operation routes with steps ordered by Position
+    /// and attempts ordered by Number. Concurrent reads must not observe uncommitted attempt claims.
     /// Saving must detect concurrent aggregate changes, including child additions, and reject them
     /// atomically with PaymentConcurrencyException. Missing and foreign payments both return null.
     /// </summary>

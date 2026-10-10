@@ -48,8 +48,6 @@ public sealed record PaymentRoutingDecision
         long configurationVersion, long policyVersion, PaymentRoutingFailureReason reason,
         Guid? matchedRuleId, string explanation)
     {
-        if (!Enum.IsDefined(reason))
-            throw new ArgumentOutOfRangeException(nameof(reason));
         return new(configurationVersion, policyVersion, [], matchedRuleId, explanation, reason);
     }
 }

@@ -40,7 +40,24 @@ public sealed class Payment : AuditableEntity
         return operation;
     }
 
-    /// <summary>Creates an operation attempt through an eligible provider account.</summary>
+    /// <summary>Saves the operation route once, before any provider calls.</summary>
+    /// <remarks>
+    /// Authorize and Charge require a policy version. Follow-up operations require exactly
+    /// the original provider account and no policy version. An empty initial route records an unroutable decision.
+    /// Application supplies the merchant configuration snapshot and checks account availability.
+    /// </remarks>
+    public void SetOperationRoute(
+        Guid operationId, long configurationVersion, long? policyVersion,
+        IEnumerable<Guid> providerAccountIds, Guid? matchedRuleId, string explanation)
+    {
+        var operation = GetActiveOperation(operationId);
+        var route = new PaymentOperationRoute(
+            operation.Id, configurationVersion, policyVersion, providerAccountIds, matchedRuleId, explanation);
+        EnsureRouteAllowed(operation, route);
+        operation.SetRoute(route);
+    }
+
+    /// <summary>Creates an operation attempt through an account in its saved route.</summary>
     /// <remarks>
     /// Authorize and Charge require a payment-method binding to the selected account.
     /// Capture, Void and Refund use the account of the original successful operation.
@@ -49,9 +66,15 @@ public sealed class Payment : AuditableEntity
     public PaymentAttempt StartAttempt(Guid operationId, Guid providerAccountId)
     {
         var operation = GetActiveOperation(operationId);
-        EnsureProviderAccountAllowed(operation, providerAccountId);
-
         return operation.StartAttempt(providerAccountId);
+    }
+
+    /// <summary>Returns the original successful account for a Capture, Void or Refund operation.</summary>
+    public Guid GetOriginalProviderAccountId(Guid operationId)
+    {
+        var operation = GetActiveOperation(operationId);
+        return GetOriginalAttempt(operation.Type)?.ProviderAccountId
+            ?? throw new InvalidOperationException("The operation has no original successful provider attempt.");
     }
 
     public void RecordAttemptSuccess(
@@ -103,6 +126,17 @@ public sealed class Payment : AuditableEntity
             : GetOriginalAttempt(operation.Type)?.ProviderAccountId == providerAccountId;
         if (!allowed)
             throw new InvalidOperationException("The provider account is not allowed for this operation.");
+    }
+
+    private void EnsureRouteAllowed(PaymentOperation operation, PaymentOperationRoute route)
+    {
+        var initial = operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge;
+        if (initial != (route.PolicyVersion is not null))
+            throw new InvalidOperationException("Only initial operations use a routing policy.");
+        if (!initial && route.Steps.Count != 1)
+            throw new InvalidOperationException("A follow-up operation must route to the original provider account.");
+        foreach (var step in route.Steps)
+            EnsureProviderAccountAllowed(operation, step.ProviderAccountId);
     }
 
     private void EnsureOperationAllowed(PaymentOperationType type, Money amount)

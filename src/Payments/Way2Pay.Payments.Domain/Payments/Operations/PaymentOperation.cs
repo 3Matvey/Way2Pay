@@ -14,6 +14,7 @@ public sealed class PaymentOperation : AuditableEntity
     public Money Amount { get; }
     public PaymentOperationStatus Status { get; private set; }
     public string? OriginalProviderTransactionId { get; private set; }
+    public PaymentOperationRoute? Route { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
     public IReadOnlyList<PaymentAttempt> Attempts => _attempts.AsReadOnly();
 
@@ -30,11 +31,20 @@ public sealed class PaymentOperation : AuditableEntity
         Status = PaymentOperationStatus.Pending;
     }
 
+    internal void SetRoute(PaymentOperationRoute route)
+    {
+        if (Status != PaymentOperationStatus.Pending || Route is not null || _attempts.Count != 0)
+            throw new InvalidOperationException("The route can only be assigned once before the first attempt.");
+        Route = route;
+    }
+
     internal PaymentAttempt StartAttempt(Guid providerAccountId)
     {
         EnsurePendingOrProcessing();
         EnsureAllAttemptsFailed();
-        var attempt = new PaymentAttempt(Id, providerAccountId, _attempts.Count + 1);
+        var step = Route?.Steps.SingleOrDefault(candidate => candidate.ProviderAccountId == providerAccountId)
+            ?? throw new InvalidOperationException("The provider account must belong to the saved operation route.");
+        var attempt = new PaymentAttempt(Id, step.Id, providerAccountId, _attempts.Count + 1);
         _attempts.Add(attempt);
         Status = PaymentOperationStatus.Processing;
         return attempt;
@@ -62,9 +72,9 @@ public sealed class PaymentOperation : AuditableEntity
 
     internal void MarkUnknown()
     {
-        if (Status != PaymentOperationStatus.Processing
+        if (Status is not (PaymentOperationStatus.Processing or PaymentOperationStatus.Unknown)
             || _attempts.LastOrDefault()?.Status != PaymentAttemptStatus.Unknown)
-            throw new InvalidOperationException("A processing operation requires an unknown current attempt.");
+            throw new InvalidOperationException("An unresolved operation requires an unknown current attempt.");
 
         Status = PaymentOperationStatus.Unknown;
     }

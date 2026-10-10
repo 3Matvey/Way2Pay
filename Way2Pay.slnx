@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Merchants/" />
   <Folder Name="/Payments/">
+    <Project Path="src/Payments/Way2Pay.Payments.Application/Way2Pay.Payments.Application.csproj" Id="d17ebb8b-3130-4957-bea8-b8d20b931339" />
     <Project Path="src/Payments/Way2Pay.Payments.Domain/Way2Pay.Payments.Domain.csproj" Id="ea5c3f52-b34c-41d5-9c47-7f1bda42ae9f" />
   </Folder>
   <Project Path="src/Way2Pay.AppHost/Way2Pay.AppHost.csproj" Id="f70f8728-7a77-4487-8914-5b17b091211d" />

@@ -6,6 +6,8 @@ namespace Way2Pay.Payments.Domain.Payments.Attempts;
 public sealed class PaymentAttempt : AuditableEntity
 {
     public Guid PaymentOperationId { get; private set; }
+    /// <summary>The saved route step used for this provider call.</summary>
+    public Guid RouteStepId { get; private set; }
     public Guid ProviderAccountId { get; private set; }
     public int Number { get; private set; }
     public PaymentAttemptStatus Status { get; private set; }
@@ -15,12 +17,13 @@ public sealed class PaymentAttempt : AuditableEntity
     public string? FailureCode { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
 
-    internal PaymentAttempt(Guid operationId, Guid providerAccountId, int number)
+    internal PaymentAttempt(Guid operationId, Guid routeStepId, Guid providerAccountId, int number)
     {
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number), "The attempt number must be positive.");
 
         PaymentOperationId = Guard.RequiredId(operationId);
+        RouteStepId = Guard.RequiredId(routeStepId);
         ProviderAccountId = Guard.RequiredId(providerAccountId);
         Number = number;
         Status = PaymentAttemptStatus.Processing;
@@ -47,14 +50,12 @@ public sealed class PaymentAttempt : AuditableEntity
         CompletedAt = now;
     }
 
-    /// <summary>Marks a processing attempt as Unknown and records the known transaction ID.</summary>
+    /// <summary>Marks an unresolved attempt as Unknown or adds a newly learned transaction ID to an Unknown attempt.</summary>
     /// <param name="providerTransactionId">An optional transaction ID; null means the provider has not supplied one.</param>
     /// <remarks>CompletedAt remains unset because the monetary outcome has not been established.</remarks>
     internal void MarkUnknown(string? providerTransactionId)
     {
-        if (Status != PaymentAttemptStatus.Processing)
-            throw new InvalidOperationException("Only a processing attempt can become unknown.");
-
+        EnsureUnresolved();
         if (providerTransactionId is not null)
             RecordProviderTransactionId(providerTransactionId);
         Status = PaymentAttemptStatus.Unknown;
