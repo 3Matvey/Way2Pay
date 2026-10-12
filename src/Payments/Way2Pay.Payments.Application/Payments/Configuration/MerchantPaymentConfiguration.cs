@@ -1,4 +1,4 @@
-using Way2Pay.Payments.Application.Payments.Routing;
+using Way2Pay.Routing.Contracts;
 using Way2Pay.Payments.Domain.Common;
 
 namespace Way2Pay.Payments.Application.Payments.Configuration;

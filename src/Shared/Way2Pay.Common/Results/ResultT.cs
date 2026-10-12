@@ -1,4 +1,4 @@
-namespace Way2Pay.Payments.Application.Common.Results;
+namespace Way2Pay.Common.Results;
 
 /// <summary>
 /// Represents a result with a value of type <typeparamref name="TValue"/>.

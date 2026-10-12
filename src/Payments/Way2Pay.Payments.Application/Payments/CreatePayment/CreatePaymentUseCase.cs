@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Application.Common.Interfaces;
-using Way2Pay.Payments.Application.Common.Results;
 using Way2Pay.Payments.Domain.Payments;
 using Way2Pay.Payments.Domain.ValueObjects;
 

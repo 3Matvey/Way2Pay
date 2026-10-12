@@ -1,5 +1,6 @@
 using Way2Pay.Payments.Domain.Payments.Operations;
 using Way2Pay.Payments.Domain.ValueObjects;
+using Way2Pay.Routing.Contracts;
 
 namespace Way2Pay.Payments.Application.Payments.Routing;
 
@@ -19,7 +20,7 @@ public sealed record PaymentRoutingContext(
     Guid OperationId,
     PaymentOperationType OperationType,
     Money Amount,
-    PaymentMethodType PaymentMethodType,
+    RoutingPaymentMethodType PaymentMethodType,
     long ConfigurationVersion,
     IReadOnlyList<Guid> EligibleProviderAccounts)
 {

@@ -8,5 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Way2Pay.Payments.Domain\Way2Pay.Payments.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Way2Pay.Common\Way2Pay.Common.csproj" />
+    <ProjectReference Include="..\..\Shared\Way2Pay.Routing.Contracts\Way2Pay.Routing.Contracts.csproj" />
   </ItemGroup>
 </Project>

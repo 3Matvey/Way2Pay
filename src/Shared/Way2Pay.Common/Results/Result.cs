@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Way2Pay.Payments.Application.Common.Results;
+namespace Way2Pay.Common.Results;
 
 /// <summary>
 /// Represents the result of an operation that can either be successful or contain an error.

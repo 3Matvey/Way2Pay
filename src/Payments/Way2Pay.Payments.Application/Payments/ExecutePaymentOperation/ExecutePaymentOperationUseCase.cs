@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Application.Common.Interfaces;
-using Way2Pay.Payments.Application.Common.Results;
 using Way2Pay.Payments.Application.Payments.Configuration;
 using Way2Pay.Payments.Application.Payments.Providers;
 using Way2Pay.Payments.Application.Payments.Routing;

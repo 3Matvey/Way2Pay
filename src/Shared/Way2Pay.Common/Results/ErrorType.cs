@@ -1,4 +1,4 @@
-namespace Way2Pay.Payments.Application.Common.Results;
+namespace Way2Pay.Common.Results;
 
 /// <summary>
 /// Represents the types of errors that can occur in the application.

@@ -2,6 +2,8 @@ using Way2Pay.Payments.Application.Payments.Configuration;
 using Way2Pay.Payments.Application.Payments.Routing;
 using Way2Pay.Payments.Domain.Payments;
 using Way2Pay.Payments.Domain.Payments.Operations;
+using Way2Pay.Payments.Domain.ValueObjects;
+using Way2Pay.Routing.Contracts;
 
 namespace Way2Pay.Payments.Application.Payments.ExecutePaymentOperation;
 
@@ -59,12 +61,19 @@ internal static class PaymentExecutionRouting
         IReadOnlyList<Guid> eligibleAccounts, IPaymentRoutingEngine routingEngine)
     {
         var context = new PaymentRoutingContext(payment.MerchantId, payment.Id, operation.Id,
-            operation.Type, operation.Amount, payment.PaymentMethod.Type, configuration.Version, eligibleAccounts);
+            operation.Type, operation.Amount, ToRoutingPaymentMethod(payment.PaymentMethod.Type), configuration.Version, eligibleAccounts);
         var decision = routingEngine.Evaluate(context, configuration.RoutingPolicy);
         EnsureDecisionMatchesConfiguration(decision, configuration, eligibleAccounts);
         payment.SetOperationRoute(operation.Id, decision.ConfigurationVersion, decision.PolicyVersion,
             decision.ProviderAccountIds, decision.MatchedRuleId, decision.Explanation);
     }
+
+    private static RoutingPaymentMethodType ToRoutingPaymentMethod(PaymentMethodType type) => type switch
+    {
+        PaymentMethodType.Card => RoutingPaymentMethodType.Card,
+        PaymentMethodType.BankAccount => RoutingPaymentMethodType.BankAccount,
+        _ => throw new ArgumentOutOfRangeException(nameof(type), "The payment method has no routing representation.")
+    };
 
     private static void EnsureDecisionMatchesConfiguration(
         PaymentRoutingDecision decision, MerchantPaymentConfiguration configuration, IReadOnlyList<Guid> eligibleAccounts)

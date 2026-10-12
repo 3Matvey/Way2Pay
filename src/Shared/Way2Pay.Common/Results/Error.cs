@@ -1,4 +1,4 @@
-namespace Way2Pay.Payments.Application.Common.Results;
+namespace Way2Pay.Common.Results;
 
 /// <summary>
 /// Represents an error in the application.

@@ -1,4 +1,4 @@
-namespace Way2Pay.Payments.Application.Payments.Routing;
+namespace Way2Pay.Routing.Contracts;
 
 /// <summary>A published policy snapshot with ordered rules and a default account route.</summary>
 /// <remarks>

@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Application.Common.Results;
-
 namespace Way2Pay.Payments.Application.Payments;
 
 public static class PaymentErrors
