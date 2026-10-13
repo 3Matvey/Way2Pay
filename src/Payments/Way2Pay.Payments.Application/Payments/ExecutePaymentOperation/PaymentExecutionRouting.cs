@@ -41,10 +41,11 @@ internal static class PaymentExecutionRouting
 
     internal static void SetRoute(
         Payment payment, PaymentOperation operation, MerchantPaymentConfiguration configuration,
-        IReadOnlyList<Guid> eligibleAccounts, IPaymentRoutingEngine routingEngine)
+        IReadOnlyList<Guid> eligibleAccounts, IPaymentRoutingEngine routingEngine, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (IsInitial(operation))
-            SetInitialRoute(payment, operation, configuration, eligibleAccounts, routingEngine);
+            SetInitialRoute(payment, operation, configuration, eligibleAccounts, routingEngine, cancellationToken);
         else
             SetOriginalAccountRoute(payment, operation, configuration.Version);
     }
@@ -58,11 +59,11 @@ internal static class PaymentExecutionRouting
 
     private static void SetInitialRoute(
         Payment payment, PaymentOperation operation, MerchantPaymentConfiguration configuration,
-        IReadOnlyList<Guid> eligibleAccounts, IPaymentRoutingEngine routingEngine)
+        IReadOnlyList<Guid> eligibleAccounts, IPaymentRoutingEngine routingEngine, CancellationToken cancellationToken)
     {
         var context = new PaymentRoutingContext(payment.MerchantId, payment.Id, operation.Id,
             operation.Type, operation.Amount, ToRoutingPaymentMethod(payment.PaymentMethod.Type), configuration.Version, eligibleAccounts);
-        var decision = routingEngine.Evaluate(context, configuration.RoutingPolicy);
+        var decision = routingEngine.Evaluate(context, configuration.RoutingPolicy, cancellationToken);
         EnsureDecisionMatchesConfiguration(decision, configuration, eligibleAccounts);
         payment.SetOperationRoute(operation.Id, decision.ConfigurationVersion, decision.PolicyVersion,
             decision.ProviderAccountIds, decision.MatchedRuleId, decision.Explanation);

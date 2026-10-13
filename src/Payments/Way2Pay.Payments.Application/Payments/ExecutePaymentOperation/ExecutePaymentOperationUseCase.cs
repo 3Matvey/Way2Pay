@@ -69,7 +69,7 @@ public sealed class ExecutePaymentOperationUseCase(
             throw new InvalidOperationException("The configuration belongs to a different merchant.");
         var eligible = PaymentExecutionRouting.GetEligibleAccounts(payment, operation, configuration);
         if (operation.Route is null)
-            PaymentExecutionRouting.SetRoute(payment, operation, configuration, eligible, routingEngine);
+            PaymentExecutionRouting.SetRoute(payment, operation, configuration, eligible, routingEngine, cancellationToken);
         return await ExecuteNextStepAsync(payment, operation, eligible, cancellationToken);
     }
 
