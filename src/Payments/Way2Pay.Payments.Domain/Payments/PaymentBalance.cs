@@ -6,10 +6,14 @@ namespace Way2Pay.Payments.Domain.Payments;
 /// <summary>Confirmed amounts for one payment. Authorized is the remaining authorization.</summary>
 public sealed class PaymentBalance
 {
-    public Money Authorized { get; private set; }
-    public Money Captured { get; private set; }
-    public Money Refunded { get; private set; }
+    public Money Authorized { get; private set; } = null!;
+    public Money Captured { get; private set; } = null!;
+    public Money Refunded { get; private set; } = null!;
     public Money Refundable => Captured.Subtract(Refunded);
+
+    private PaymentBalance()
+    {
+    }
 
     public PaymentBalance(CurrencyCode currency)
     {

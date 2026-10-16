@@ -9,4 +9,12 @@
     <UserSecretsId>886aef6f-7e2f-4678-9ef8-5e6618c534ea</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Payments\Way2Pay.Payments.Api\Way2Pay.Payments.Api.csproj" />
+  </ItemGroup>
+
 </Project>

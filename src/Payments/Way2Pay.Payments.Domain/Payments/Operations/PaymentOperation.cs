@@ -11,12 +11,14 @@ public sealed class PaymentOperation : AuditableEntity
 
     public Guid PaymentId { get; private set; }
     public PaymentOperationType Type { get; private set; }
-    public Money Amount { get; }
+    public Money Amount { get; private init; } = null!;
     public PaymentOperationStatus Status { get; private set; }
     public string? OriginalProviderTransactionId { get; private set; }
     public PaymentOperationRoute? Route { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
     public IReadOnlyList<PaymentAttempt> Attempts => _attempts.AsReadOnly();
+
+    private PaymentOperation() { }
 
     internal PaymentOperation(
         Guid paymentId, PaymentOperationType type, Money amount,
@@ -44,7 +46,7 @@ public sealed class PaymentOperation : AuditableEntity
         EnsureAllAttemptsFailed();
         var step = Route?.Steps.SingleOrDefault(candidate => candidate.ProviderAccountId == providerAccountId)
             ?? throw new InvalidOperationException("The provider account must belong to the saved operation route.");
-        var attempt = new PaymentAttempt(Id, step.Id, providerAccountId, _attempts.Count + 1);
+        var attempt = new PaymentAttempt(step, _attempts.Count + 1);
         _attempts.Add(attempt);
         Status = PaymentOperationStatus.Processing;
         return attempt;

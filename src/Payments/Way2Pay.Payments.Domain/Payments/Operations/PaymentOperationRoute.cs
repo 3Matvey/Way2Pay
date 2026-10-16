@@ -5,15 +5,22 @@ namespace Way2Pay.Payments.Domain.Payments.Operations;
 /// <summary>An immutable routing snapshot saved before an operation's first provider attempt.</summary>
 public sealed class PaymentOperationRoute
 {
-    public long ConfigurationVersion { get; }
+    private readonly List<PaymentOperationRouteStep> _steps = [];
+
+    public long ConfigurationVersion { get; private init; }
     /// <summary>Null when the account is inherited from the original successful operation.</summary>
-    public long? PolicyVersion { get; }
+    public long? PolicyVersion { get; private init; }
     /// <summary>Null for the default route or a route inherited from the original operation.</summary>
-    public Guid? MatchedRuleId { get; }
-    public string Explanation { get; }
+    public Guid? MatchedRuleId { get; private init; }
+    public string Explanation { get; private init; } = null!;
     /// <summary>Provider accounts in routing priority order. Positions start at one.</summary>
     /// <remarks>An empty route records a decision with no available provider accounts.</remarks>
-    public IReadOnlyList<PaymentOperationRouteStep> Steps { get; }
+    public IReadOnlyList<PaymentOperationRouteStep> Steps => _steps.AsReadOnly();
+
+    /// <summary>Used by persistence to restore the route and populate its backing collection.</summary>
+    private PaymentOperationRoute()
+    {
+    }
 
     internal PaymentOperationRoute(
         Guid operationId, long configurationVersion, long? policyVersion,
@@ -24,7 +31,7 @@ public sealed class PaymentOperationRoute
         PolicyVersion = policyVersion;
         MatchedRuleId = matchedRuleId;
         Explanation = Guard.Required(explanation);
-        Steps = CreateSteps(operationId, providerAccountIds);
+        _steps.AddRange(CreateSteps(operationId, providerAccountIds));
     }
 
     private static void ValidateVersions(long configurationVersion, long? policyVersion, Guid? matchedRuleId)
@@ -38,15 +45,14 @@ public sealed class PaymentOperationRoute
             throw new ArgumentException("A matched rule requires a routing policy version.", nameof(matchedRuleId));
     }
 
-    private static IReadOnlyList<PaymentOperationRouteStep> CreateSteps(
+    private static PaymentOperationRouteStep[] CreateSteps(
         Guid operationId, IEnumerable<Guid> providerAccountIds)
     {
         ArgumentNullException.ThrowIfNull(providerAccountIds);
         var accounts = providerAccountIds.ToArray();
         if (accounts.Distinct().Count() != accounts.Length)
             throw new ArgumentException("A provider account cannot occur twice in a route.", nameof(providerAccountIds));
-        var steps = accounts.Select((accountId, index) =>
+        return accounts.Select((accountId, index) =>
             new PaymentOperationRouteStep(operationId, index + 1, accountId)).ToArray();
-        return Array.AsReadOnly(steps);
     }
 }

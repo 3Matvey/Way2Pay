@@ -1,4 +1,5 @@
 using Way2Pay.Payments.Domain.Common;
+using Way2Pay.Payments.Domain.Payments.Operations;
 
 namespace Way2Pay.Payments.Domain.Payments.Attempts;
 
@@ -8,7 +9,9 @@ public sealed class PaymentAttempt : AuditableEntity
     public Guid PaymentOperationId { get; private set; }
     /// <summary>The saved route step used for this provider call.</summary>
     public Guid RouteStepId { get; private set; }
-    public Guid ProviderAccountId { get; private set; }
+    public PaymentOperationRouteStep RouteStep { get; private init; } = null!;
+    /// <summary>The provider account from the route step, without a separate stored value.</summary>
+    public Guid ProviderAccountId => RouteStep.ProviderAccountId;
     public int Number { get; private set; }
     public PaymentAttemptStatus Status { get; private set; }
     /// <summary>The provider transaction identifier, which may be known before the final outcome.</summary>
@@ -17,14 +20,15 @@ public sealed class PaymentAttempt : AuditableEntity
     public string? FailureCode { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
 
-    internal PaymentAttempt(Guid operationId, Guid routeStepId, Guid providerAccountId, int number)
-    {
-        if (number <= 0)
-            throw new ArgumentOutOfRangeException(nameof(number), "The attempt number must be positive.");
+    private PaymentAttempt() { }
 
-        PaymentOperationId = Guard.RequiredId(operationId);
-        RouteStepId = Guard.RequiredId(routeStepId);
-        ProviderAccountId = Guard.RequiredId(providerAccountId);
+    internal PaymentAttempt(PaymentOperationRouteStep routeStep, int number)
+    {
+        ArgumentNullException.ThrowIfNull(routeStep);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(number);
+        PaymentOperationId = routeStep.PaymentOperationId;
+        RouteStepId = routeStep.Id;
+        RouteStep = routeStep;
         Number = number;
         Status = PaymentAttemptStatus.Processing;
     }

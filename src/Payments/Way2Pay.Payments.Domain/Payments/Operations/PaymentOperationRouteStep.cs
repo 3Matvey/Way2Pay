@@ -10,10 +10,10 @@ public sealed class PaymentOperationRouteStep : Entity
     public int Position { get; }
     public Guid ProviderAccountId { get; }
 
-    internal PaymentOperationRouteStep(Guid operationId, int position, Guid providerAccountId)
+    internal PaymentOperationRouteStep(Guid paymentOperationId, int position, Guid providerAccountId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(position);
-        PaymentOperationId = Guard.RequiredId(operationId);
+        PaymentOperationId = Guard.RequiredId(paymentOperationId);
         Position = position;
         ProviderAccountId = Guard.RequiredId(providerAccountId);
     }

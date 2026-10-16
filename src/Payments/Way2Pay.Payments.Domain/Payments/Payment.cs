@@ -11,13 +11,20 @@ public sealed class Payment : AuditableEntity
     private readonly List<PaymentOperation> _operations = [];
 
     public Guid MerchantId { get; private set; }
-    public Money Amount { get; }
+    public Money Amount { get; private init; } = null!;
     /// <summary>The payment-method snapshot assigned when the payment is created.</summary>
-    public PaymentMethod PaymentMethod { get; }
+    public PaymentMethod PaymentMethod { get; private init; } = null!;
     public CurrencyCode Currency => Amount.Currency;
     public PaymentStatus Status { get; private set; }
-    public PaymentBalance Balance { get; }
+    /// <summary>The aggregate version used to detect concurrent changes when saving.</summary>
+    /// <remarks>Each successful state-changing method increments it, including changes to operations and attempts.</remarks>
+    public long Version { get; private set; }
+    public PaymentBalance Balance { get; private init; } = null!;
     public IReadOnlyList<PaymentOperation> Operations => _operations.AsReadOnly();
+
+    private Payment()
+    {
+    }
 
     public Payment(Guid merchantId, Money amount, PaymentMethod paymentMethod)
     {
@@ -37,6 +44,7 @@ public sealed class Payment : AuditableEntity
         EnsureOperationAllowed(type, amount);
         var operation = new PaymentOperation(Id, type, amount, GetOriginalAttempt(type)?.ProviderTransactionId);
         _operations.Add(operation);
+        Version++;
         return operation;
     }
 
@@ -55,6 +63,7 @@ public sealed class Payment : AuditableEntity
             operation.Id, configurationVersion, policyVersion, providerAccountIds, matchedRuleId, explanation);
         EnsureRouteAllowed(operation, route);
         operation.SetRoute(route);
+        Version++;
     }
 
     /// <summary>Creates an operation attempt through an account in its saved route.</summary>
@@ -66,7 +75,9 @@ public sealed class Payment : AuditableEntity
     public PaymentAttempt StartAttempt(Guid operationId, Guid providerAccountId)
     {
         var operation = GetActiveOperation(operationId);
-        return operation.StartAttempt(providerAccountId);
+        var attempt = operation.StartAttempt(providerAccountId);
+        Version++;
+        return attempt;
     }
 
     /// <summary>Returns the original successful account for a Capture, Void or Refund operation.</summary>
@@ -86,6 +97,7 @@ public sealed class Payment : AuditableEntity
         attempt.Succeed(providerTransactionId, now);
         ApplySuccessfulOperation(operation);
         operation.Succeed(now);
+        Version++;
     }
 
     /// <summary>Records a verified failure with no monetary effect. A timeout is not such evidence.</summary>
@@ -96,6 +108,7 @@ public sealed class Payment : AuditableEntity
         var operation = GetActiveOperation(operationId);
         operation.GetCurrentAttempt(attemptId).Fail(failureCode, now, providerTransactionId);
         operation.ResumeAfterConfirmedFailure();
+        Version++;
     }
 
     /// <summary>Marks the current attempt as unknown and blocks new attempts until its outcome is resolved.</summary>
@@ -108,6 +121,7 @@ public sealed class Payment : AuditableEntity
         var operation = GetActiveOperation(operationId);
         operation.GetCurrentAttempt(attemptId).MarkUnknown(providerTransactionId);
         operation.MarkUnknown();
+        Version++;
     }
 
     /// <summary>Finishes an operation when no further safe attempts should be made.</summary>
@@ -117,6 +131,7 @@ public sealed class Payment : AuditableEntity
         operation.Fail(now);
         if (operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge)
             Status = PaymentStatus.Failed;
+        Version++;
     }
 
     private void EnsureProviderAccountAllowed(PaymentOperation operation, Guid providerAccountId)
@@ -154,11 +169,15 @@ public sealed class Payment : AuditableEntity
         {
             PaymentOperationType.Authorize or PaymentOperationType.Charge =>
                 Status == PaymentStatus.Created && amount == Amount,
+
             PaymentOperationType.Capture or PaymentOperationType.Void =>
-                Status == PaymentStatus.Authorized && GetOriginalAttempt(type) is not null && amount == Balance.Authorized,
+                Status == PaymentStatus.Authorized && GetOriginalAttempt(type) is not null 
+                && amount == Balance.Authorized,
+
             PaymentOperationType.Refund =>
                 (Status is PaymentStatus.Captured or PaymentStatus.PartiallyRefunded)
                 && GetOriginalAttempt(type) is not null && Balance.CanRefund(amount),
+
             _ => false
         };
 
