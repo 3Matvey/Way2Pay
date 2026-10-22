@@ -338,6 +338,14 @@ namespace Way2Pay.Payments.Infrastructure.Persistence.Migrations
                                 .HasColumnType("uniqueidentifier")
                                 .HasColumnName("Id");
 
+                            b1.Property<Guid>("SourceId")
+                                .HasColumnType("uniqueidentifier")
+                                .HasColumnName("PaymentMethodSourceId");
+
+                            b1.Property<int>("SourceKind")
+                                .HasColumnType("int")
+                                .HasColumnName("PaymentMethodSourceKind");
+
                             b1.Property<int>("Type")
                                 .HasColumnType("int")
                                 .HasColumnName("PaymentMethodType");
@@ -348,28 +356,6 @@ namespace Way2Pay.Payments.Infrastructure.Persistence.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("PaymentId");
-
-                            b1.OwnsMany("Way2Pay.Payments.Domain.ValueObjects.ProviderPaymentMethodReference", "ProviderReferences", b2 =>
-                                {
-                                    b2.Property<Guid>("PaymentId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<Guid>("ProviderAccountId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b2.Property<string>("Reference")
-                                        .IsRequired()
-                                        .HasColumnType("nvarchar(max)");
-
-                                    b2.HasKey("PaymentId", "ProviderAccountId");
-
-                                    b2.ToTable("PaymentMethodReferences", (string)null);
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("PaymentId");
-                                });
-
-                            b1.Navigation("ProviderReferences");
                         });
 
                     b.Navigation("PaymentMethod")

@@ -13,7 +13,8 @@ namespace Way2Pay.Payments.Application.Payments.Providers;
 /// <param name="Amount">The positive operation amount in the payment currency.</param>
 /// <param name="PaymentMethodType">The payment method kind, supplied explicitly for the provider adapter.</param>
 /// <param name="OriginalProviderTransactionId">Required for Capture, Void and Refund; absent for Authorize and Charge.</param>
-/// <param name="PaymentMethodReference">Required for Authorize and Charge and bound to ProviderAccountId; absent for follow-up operations.</param>
+/// <param name="PaymentMethodSource">Required for Authorize and Charge; absent for follow-up operations.
+/// Contains only the source kind and internal reference, never credentials or a provider token.</param>
 /// <remarks>
 /// The execution use case constructs the request from the aggregate and selected route.
 /// Reusing AttemptId does not imply that every provider supports safe retries.
@@ -28,4 +29,4 @@ public sealed record ProviderOperationRequest(
     Money Amount,
     PaymentMethodType PaymentMethodType,
     string? OriginalProviderTransactionId,
-    ProviderPaymentMethodReference? PaymentMethodReference);
+    PaymentMethod? PaymentMethodSource);

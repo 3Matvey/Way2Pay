@@ -1,4 +1,5 @@
 using Way2Pay.Payments.Application.Payments.Configuration;
+using Way2Pay.Payments.Application.Payments.PaymentMethods;
 using Way2Pay.Payments.Application.Payments.Routing;
 using Way2Pay.Payments.Domain.Payments;
 using Way2Pay.Payments.Domain.Payments.Operations;
@@ -14,23 +15,39 @@ internal static class PaymentExecutionRouting
         operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge;
 
     internal static Guid[] GetEligibleAccounts(
-        Payment payment, PaymentOperation operation, MerchantPaymentConfiguration configuration)
+        Payment payment, PaymentOperation operation, MerchantPaymentConfiguration configuration,
+        PaymentMethodAvailability? methodAvailability)
     {
         return configuration.ProviderAccounts
-            .Where(account => IsAccountEligible(account, payment, operation))
+            .Where(account => IsAccountEligible(account, payment, operation, methodAvailability))
             .Select(account => account.ProviderAccountId)
             .ToArray();
     }
 
     private static bool IsAccountEligible(
-        ProviderAccountConfiguration account, Payment payment, PaymentOperation operation)
+        ProviderAccountConfiguration account, Payment payment, PaymentOperation operation,
+        PaymentMethodAvailability? methodAvailability)
     {
         if (!account.IsActive || !SupportsOperation(account, payment, operation))
             return false;
         if (!IsInitial(operation))
             return true;
-        return payment.PaymentMethod.ProviderReferences.Any(
-            reference => reference.ProviderAccountId == account.ProviderAccountId);
+        return SupportsSource(account, payment.PaymentMethod, methodAvailability);
+    }
+
+    private static bool SupportsSource(
+        ProviderAccountConfiguration account, PaymentMethod method, PaymentMethodAvailability? availability)
+    {
+        if (availability is not { IsAvailable: true }
+            || !account.SupportedPaymentMethodSources.Contains(method.SourceKind))
+            return false;
+
+        return method.SourceKind switch
+        {
+            PaymentMethodSourceKind.VaultCard => availability.ProviderAccountId is null,
+            PaymentMethodSourceKind.ProviderToken => availability.ProviderAccountId == account.ProviderAccountId,
+            _ => false
+        };
     }
 
     private static bool SupportsOperation(

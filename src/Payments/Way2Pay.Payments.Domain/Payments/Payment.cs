@@ -12,7 +12,7 @@ public sealed class Payment : AuditableEntity
 
     public Guid MerchantId { get; private set; }
     public Money Amount { get; private init; } = null!;
-    /// <summary>The payment-method snapshot assigned when the payment is created.</summary>
+    /// <summary>The payment credential source assigned when the payment is created.</summary>
     public PaymentMethod PaymentMethod { get; private init; } = null!;
     public CurrencyCode Currency => Amount.Currency;
     public PaymentStatus Status { get; private set; }
@@ -52,7 +52,7 @@ public sealed class Payment : AuditableEntity
     /// <remarks>
     /// Authorize and Charge require a policy version. Follow-up operations require exactly
     /// the original provider account and no policy version. An empty initial route records an unroutable decision.
-    /// Application supplies the merchant configuration snapshot and checks account availability.
+    /// Application checks account availability, merchant permissions and credential-source compatibility.
     /// </remarks>
     public void SetOperationRoute(
         Guid operationId, long configurationVersion, long? policyVersion,
@@ -68,9 +68,8 @@ public sealed class Payment : AuditableEntity
 
     /// <summary>Creates an operation attempt through an account in its saved route.</summary>
     /// <remarks>
-    /// Authorize and Charge require a payment-method binding to the selected account.
     /// Capture, Void and Refund use the account of the original successful operation.
-    /// Application checks account availability and the merchant permission to use it.
+    /// Application checks account availability, merchant permissions and credential-source compatibility.
     /// </remarks>
     public PaymentAttempt StartAttempt(Guid operationId, Guid providerAccountId)
     {
@@ -134,24 +133,14 @@ public sealed class Payment : AuditableEntity
         Version++;
     }
 
-    private void EnsureProviderAccountAllowed(PaymentOperation operation, Guid providerAccountId)
-    {
-        var allowed = operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge
-            ? PaymentMethod.ProviderReferences.Any(reference => reference.ProviderAccountId == providerAccountId)
-            : GetOriginalAttempt(operation.Type)?.ProviderAccountId == providerAccountId;
-        if (!allowed)
-            throw new InvalidOperationException("The provider account is not allowed for this operation.");
-    }
-
     private void EnsureRouteAllowed(PaymentOperation operation, PaymentOperationRoute route)
     {
         var initial = operation.Type is PaymentOperationType.Authorize or PaymentOperationType.Charge;
         if (initial != (route.PolicyVersion is not null))
             throw new InvalidOperationException("Only initial operations use a routing policy.");
-        if (!initial && route.Steps.Count != 1)
+        if (!initial && (route.Steps.Count != 1
+            || route.Steps[0].ProviderAccountId != GetOriginalAttempt(operation.Type)?.ProviderAccountId))
             throw new InvalidOperationException("A follow-up operation must route to the original provider account.");
-        foreach (var step in route.Steps)
-            EnsureProviderAccountAllowed(operation, step.ProviderAccountId);
     }
 
     private void EnsureOperationAllowed(PaymentOperationType type, Money amount)

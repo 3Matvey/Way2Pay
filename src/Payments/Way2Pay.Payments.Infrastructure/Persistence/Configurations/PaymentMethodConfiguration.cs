@@ -12,18 +12,7 @@ internal static class PaymentMethodConfiguration
         builder.WithOwner().HasForeignKey("PaymentId");
         builder.Property<Guid>("PaymentId").HasColumnName("Id");
         builder.Property(method => method.Type).HasColumnName("PaymentMethodType");
-        builder.OwnsMany(method => method.ProviderReferences, ConfigureReferences);
-        builder.Navigation(method => method.ProviderReferences)
-            .HasField("_providerReferences").UsePropertyAccessMode(PropertyAccessMode.Field);
-    }
-
-    private static void ConfigureReferences(OwnedNavigationBuilder<PaymentMethod, ProviderPaymentMethodReference> builder)
-    {
-        builder.ToTable("PaymentMethodReferences");
-        builder.WithOwner().HasForeignKey("PaymentId");
-        builder.Property<Guid>("PaymentId");
-        builder.Property(reference => reference.ProviderAccountId).ValueGeneratedNever();
-        builder.Property(reference => reference.Reference).IsRequired();
-        builder.HasKey("PaymentId", nameof(ProviderPaymentMethodReference.ProviderAccountId));
+        builder.Property(method => method.SourceKind).HasColumnName("PaymentMethodSourceKind");
+        builder.Property(method => method.SourceId).HasColumnName("PaymentMethodSourceId");
     }
 }

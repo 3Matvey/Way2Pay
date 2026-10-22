@@ -1,4 +1,5 @@
 using Way2Pay.Payments.Application.Payments.Configuration;
+using Way2Pay.Payments.Application.Payments.PaymentMethods;
 using Way2Pay.Payments.Application.Payments.Providers;
 using Way2Pay.Payments.Application.Payments.Routing;
 using Way2Pay.Payments.Domain.Payments;
@@ -18,6 +19,7 @@ namespace Way2Pay.Payments.Application.Payments.ExecutePaymentOperation;
 public sealed class ExecutePaymentOperationUseCase(
     IPaymentRepository paymentRepository,
     IMerchantPaymentConfigurationProvider configurationProvider,
+    IPaymentMethodAvailabilityProvider paymentMethodAvailabilityProvider,
     IPaymentRoutingEngine routingEngine,
     IPaymentProviderGateway providerGateway,
     IUnitOfWork unitOfWork,
@@ -67,7 +69,19 @@ public sealed class ExecutePaymentOperationUseCase(
             return PaymentErrors.MerchantUnavailable();
         if (configuration.MerchantId != payment.MerchantId)
             throw new InvalidOperationException("The configuration belongs to a different merchant.");
-        var eligible = PaymentExecutionRouting.GetEligibleAccounts(payment, operation, configuration);
+        return await PrepareRouteAsync(payment, operation, configuration, cancellationToken);
+    }
+
+    private async Task<Result<ExecutePaymentOperationResponse>> PrepareRouteAsync(
+        Payment payment, PaymentOperation operation, MerchantPaymentConfiguration configuration,
+        CancellationToken cancellationToken)
+    {
+        var availability = PaymentExecutionRouting.IsInitial(operation)
+            ? await paymentMethodAvailabilityProvider.GetAsync(payment.MerchantId, payment.PaymentMethod, cancellationToken)
+            : null;
+        if (PaymentExecutionRouting.IsInitial(operation) && availability is not { IsAvailable: true })
+            return PaymentErrors.PaymentMethodUnavailable();
+        var eligible = PaymentExecutionRouting.GetEligibleAccounts(payment, operation, configuration, availability);
         if (operation.Route is null)
             PaymentExecutionRouting.SetRoute(payment, operation, configuration, eligible, routingEngine, cancellationToken);
         return await ExecuteNextStepAsync(payment, operation, eligible, cancellationToken);
@@ -102,12 +116,10 @@ public sealed class ExecutePaymentOperationUseCase(
     private static ProviderOperationRequest CreateProviderRequest(
         Payment payment, PaymentOperation operation, PaymentAttempt attempt)
     {
-        var methodReference = PaymentExecutionRouting.IsInitial(operation)
-            ? payment.PaymentMethod.ProviderReferences.Single(reference => reference.ProviderAccountId == attempt.ProviderAccountId)
-            : null;
+        var source = PaymentExecutionRouting.IsInitial(operation) ? payment.PaymentMethod : null;
         return new ProviderOperationRequest(payment.MerchantId, payment.Id, operation.Id, attempt.Id,
             attempt.ProviderAccountId, operation.Type, operation.Amount, payment.PaymentMethod.Type,
-            operation.OriginalProviderTransactionId, methodReference);
+            operation.OriginalProviderTransactionId, source);
     }
 
     private async Task<Result<ExecutePaymentOperationResponse>> CallProviderAsync(

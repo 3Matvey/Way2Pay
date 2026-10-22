@@ -12,7 +12,8 @@ namespace Way2Pay.Payments.Application.Payments.Routing;
 /// <param name="Amount">The positive operation amount and currency.</param>
 /// <param name="PaymentMethodType">The kind of payment method used by the payment.</param>
 /// <param name="ConfigurationVersion">The version of the merchant configuration used to filter candidates.</param>
-/// <param name="EligibleProviderAccounts">Active merchant accounts supporting the operation, currency and method binding.</param>
+/// <param name="EligibleProviderAccounts">Active merchant accounts supporting the operation, currency and method source,
+/// restricted to the owning account when using a provider token.</param>
 /// <remarks>Application prepares the candidates. Their order does not define routing priority.</remarks>
 public sealed record PaymentRoutingContext(
     Guid MerchantId,

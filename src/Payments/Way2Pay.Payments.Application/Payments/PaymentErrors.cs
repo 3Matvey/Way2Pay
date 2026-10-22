@@ -8,6 +8,9 @@ public static class PaymentErrors
     public static Error InvalidPaymentMethod() =>
         Error.BadRequest("Payments.InvalidPaymentMethod", "A payment method is required.");
 
+    public static Error PaymentMethodUnavailable() =>
+        Error.Conflict("Payments.PaymentMethodUnavailable", "The payment credential source is not available for this merchant.");
+
     public static Error InvalidAmount() =>
         Error.BadRequest("Payments.InvalidAmount", "The payment amount must be positive.");
 
