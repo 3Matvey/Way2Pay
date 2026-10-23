@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Domain.Common;
-
 namespace Way2Pay.Payments.Domain.Payments.Operations;
 
 /// <summary>A provider account at a fixed position in an operation's saved route.</summary>

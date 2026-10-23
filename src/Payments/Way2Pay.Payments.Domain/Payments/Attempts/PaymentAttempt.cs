@@ -1,4 +1,3 @@
-using Way2Pay.Payments.Domain.Common;
 using Way2Pay.Payments.Domain.Payments.Operations;
 
 namespace Way2Pay.Payments.Domain.Payments.Attempts;

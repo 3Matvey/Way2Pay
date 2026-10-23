@@ -1,4 +1,3 @@
-using Way2Pay.Payments.Domain.Common;
 using Way2Pay.Payments.Domain.Payments.Attempts;
 using Way2Pay.Payments.Domain.ValueObjects;
 

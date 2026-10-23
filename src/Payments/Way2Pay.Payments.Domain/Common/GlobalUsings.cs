@@ -1,0 +1,1 @@
+﻿global using Way2Pay.Common.DomainAbstractions;

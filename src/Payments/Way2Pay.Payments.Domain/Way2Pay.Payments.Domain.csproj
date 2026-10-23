@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Way2Pay.Common\Way2Pay.Common.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-using Way2Pay.Payments.Domain.Common;
+using Way2Pay.Common.DomainAbstractions;
 using Way2Pay.Payments.Domain.Payments.Operations;
 using Way2Pay.Payments.Domain.ValueObjects;
 

@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Domain.Common;
-
 namespace Way2Pay.Payments.Domain.ValueObjects;
 
 public sealed record CurrencyCode

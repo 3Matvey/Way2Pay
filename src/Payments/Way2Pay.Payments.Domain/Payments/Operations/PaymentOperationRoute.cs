@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Domain.Common;
-
 namespace Way2Pay.Payments.Domain.Payments.Operations;
 
 /// <summary>An immutable routing snapshot saved before an operation's first provider attempt.</summary>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Way2Pay.Payments.Domain.Common;
+using Way2Pay.Common.DomainAbstractions;
 
 namespace Way2Pay.Payments.Infrastructure.Persistence;
 

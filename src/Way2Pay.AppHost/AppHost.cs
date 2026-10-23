@@ -11,4 +11,6 @@ builder.AddProject<Projects.Way2Pay_Payments_Api>("way2pay-payments-api")
     .WithReference(paymentsDatabase)
     .WaitFor(paymentsDatabase);
 
+builder.AddProject<Projects.Way2Pay_CardVault>("way2pay-cardvault");
+
 builder.Build().Run();

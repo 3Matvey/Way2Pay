@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/CardVault/">
+    <Project Path="src/CardVault/Way2Pay.CardVault/Way2Pay.CardVault.csproj" />
+  </Folder>
   <Folder Name="/Merchants/" />
   <Folder Name="/Payments/">
     <Project Path="M:/Way2Pay/src/Payments/Way2Pay.Payments.Application/Way2Pay.Payments.Application.csproj" Id="d17ebb8b-3130-4957-bea8-b8d20b931339" />

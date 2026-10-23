@@ -1,5 +1,3 @@
-using Way2Pay.Payments.Domain.Common;
-
 namespace Way2Pay.Payments.Domain.ValueObjects;
 
 /// <summary>An immutable reference to a payment credential source managed by CardVault.</summary>

@@ -1,5 +1,5 @@
 using Way2Pay.Routing.Contracts;
-using Way2Pay.Payments.Domain.Common;
+using Way2Pay.Common.DomainAbstractions;
 
 namespace Way2Pay.Payments.Application.Payments.Configuration;
 

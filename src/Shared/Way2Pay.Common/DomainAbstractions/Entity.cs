@@ -1,4 +1,4 @@
-﻿namespace Way2Pay.Payments.Domain.Common;
+﻿namespace Way2Pay.Common.DomainAbstractions;
 
 public abstract class Entity
 {
