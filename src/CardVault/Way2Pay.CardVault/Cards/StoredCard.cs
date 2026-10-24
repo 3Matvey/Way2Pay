@@ -9,7 +9,16 @@ public sealed class StoredCard : AuditableEntity
     public Guid MerchantId { get; private init; }
 
     /// <summary>An optional customer reference in the merchant's system, scoped to MerchantId.</summary>
-    public string? ExternalCustomerId { get; private init; }
+    public string? ExternalCustomerId
+    {
+        get;
+        private init
+        {
+            if (value is not null && (string.IsNullOrWhiteSpace(value) || value.Length > 450))
+                throw new ArgumentException("External customer identifier must be non-blank and at most 450 characters.", nameof(value));
+            field = value;
+        }
+    }
 
     /// <summary>The encrypted PAN returned by Vault Transit, never the plaintext card number.</summary>
     public string PanCiphertext { get; private init; } = string.Empty;
@@ -45,7 +54,7 @@ public sealed class StoredCard : AuditableEntity
         ArgumentNullException.ThrowIfNull(expiration);
         LastFour = lastFour;
         Expiration = expiration;
-        ExternalCustomerId = externalCustomerId is null ? null : Guard.Required(externalCustomerId);
+        ExternalCustomerId = externalCustomerId;
         Status = CardStatus.Active;
     }
 

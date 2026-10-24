@@ -13,6 +13,8 @@ internal sealed class StoredCardConfiguration : IEntityTypeConfiguration<StoredC
         builder.HasKey(card => card.Id);
         builder.Property(card => card.Id).ValueGeneratedNever();
         builder.Property(card => card.PanCiphertext).IsRequired();
+        builder.Property(card => card.ExternalCustomerId).HasMaxLength(450)
+            .UsePropertyAccessMode(PropertyAccessMode.Property);
         builder.Property(card => card.LastFour).HasColumnType("char(4)").IsRequired()
             .UsePropertyAccessMode(PropertyAccessMode.Property);
         builder.HasIndex(card => new { card.MerchantId, card.ExternalCustomerId });

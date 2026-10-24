@@ -22,6 +22,55 @@ namespace Way2Pay.CardVault.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Way2Pay.CardVault.CardRegistrationSessions.CardRegistrationSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ExternalCustomerId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("MerchantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("StoredCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("char(64)");
+
+                    b.Property<long>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("StoredCardId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.ToTable("CardRegistrationSessions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CardRegistrationSessions_Expiration", "[ExpiresAt] > [CreatedAt]");
+
+                            t.HasCheckConstraint("CK_CardRegistrationSessions_Result", "([Status] = 1 AND [StoredCardId] IS NOT NULL) OR ([Status] IN (0, 2) AND [StoredCardId] IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Way2Pay.CardVault.Cards.StoredCard", b =>
                 {
                     b.Property<Guid>("Id")
@@ -31,6 +80,7 @@ namespace Way2Pay.CardVault.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ExternalCustomerId")
+                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LastFour")
@@ -58,6 +108,14 @@ namespace Way2Pay.CardVault.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_StoredCards_Expiration", "[ExpirationMonth] BETWEEN 1 AND 12 AND [ExpirationYear] BETWEEN 1 AND 9999");
                         });
+                });
+
+            modelBuilder.Entity("Way2Pay.CardVault.CardRegistrationSessions.CardRegistrationSession", b =>
+                {
+                    b.HasOne("Way2Pay.CardVault.Cards.StoredCard", null)
+                        .WithMany()
+                        .HasForeignKey("StoredCardId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Way2Pay.CardVault.Cards.StoredCard", b =>

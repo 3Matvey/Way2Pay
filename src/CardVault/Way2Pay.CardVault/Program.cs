@@ -1,3 +1,4 @@
+using Way2Pay.CardVault.CardRegistrationSessions;
 using Way2Pay.CardVault.Cards.RegisterCard;
 using Way2Pay.CardVault.Persistence;
 using Way2Pay.CardVault.Vault;
@@ -11,6 +12,7 @@ var connectionString = builder.Configuration.GetConnectionString("cardvault-db")
     ?? throw new InvalidOperationException("The 'cardvault-db' connection string is required.");
 
 builder.Services.AddCardVaultPersistence(connectionString);
+builder.Services.AddCardRegistrationSessions(builder.Configuration);
 builder.Services.AddScoped<RegisterCardHandler>();
 
 builder.Services.AddOpenApi("public-v1", options =>
