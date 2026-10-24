@@ -15,4 +15,5 @@
   </Folder>
   <Project Path="M:/Way2Pay/src/Way2Pay.AppHost/Way2Pay.AppHost.csproj" Id="f70f8728-7a77-4487-8914-5b17b091211d" />
   <Project Path="M:/Way2Pay/src/Way2Pay.ServiceDefaults/Way2Pay.ServiceDefaults.csproj" />
+  <Project Path="src/Way2Pay.Gateway/Way2Pay.Gateway.csproj" />
 </Solution>

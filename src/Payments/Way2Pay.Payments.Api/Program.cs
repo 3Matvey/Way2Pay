@@ -4,9 +4,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi("public-v1", options =>
+{
+    options.ShouldInclude = description => description.GroupName == "public-v1";
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info.Title = "Way2Pay Payments API";
+        document.Info.Version = "v1";
+        document.Servers = [new() { Url = "/" }];
+        return Task.CompletedTask;
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("payments-db")
     ?? throw new InvalidOperationException("The 'payments-db' connection string is required.");
@@ -16,10 +24,7 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
 
 app.UseHttpsRedirection();
 

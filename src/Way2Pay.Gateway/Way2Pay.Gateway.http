@@ -1,0 +1,6 @@
+@Way2Pay.Gateway_HostAddress = http://localhost:5201
+
+GET {{Way2Pay.Gateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

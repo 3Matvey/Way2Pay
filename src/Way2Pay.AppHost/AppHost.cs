@@ -8,15 +8,24 @@ var sql = builder.AddSqlServer("sql", port: 14333)
     .WithLifetime(ContainerLifetime.Persistent);
 
 var paymentsDatabase = sql.AddDatabase("payments-db", "Way2Pay.Payments");
+var cardVaultDatabase = sql.AddDatabase("cardvault-db", "Way2Pay.CardVault");
 
 var vault = builder.AddVault();
 
-builder.AddProject<Projects.Way2Pay_Payments_Api>("way2pay-payments-api")
+var paymentsApi = builder.AddProject<Projects.Way2Pay_Payments_Api>("way2pay-payments-api")
     .WithReference(paymentsDatabase)
     .WaitFor(paymentsDatabase);
 
-builder.AddProject<Projects.Way2Pay_CardVault>("way2pay-cardvault")
+var cardVault = builder.AddProject<Projects.Way2Pay_CardVault>("way2pay-cardvault")
+    .WithReference(cardVaultDatabase)
+    .WaitFor(cardVaultDatabase)
     .WithEnvironment("Vault__Address", vault.GetEndpoint("http"))
     .WaitFor(vault);
+
+builder.AddProject<Projects.Way2Pay_Gateway>("way2pay-gateway")
+    .WithReference(paymentsApi)
+    .WithReference(cardVault)
+    .WaitFor(paymentsApi)
+    .WaitFor(cardVault);
 
 builder.Build().Run();

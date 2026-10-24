@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CardVault\Way2Pay.CardVault\Way2Pay.CardVault.csproj" />
     <ProjectReference Include="..\Payments\Way2Pay.Payments.Api\Way2Pay.Payments.Api.csproj" />
+    <ProjectReference Include="..\Way2Pay.Gateway\Way2Pay.Gateway.csproj" />
   </ItemGroup>
 
 </Project>

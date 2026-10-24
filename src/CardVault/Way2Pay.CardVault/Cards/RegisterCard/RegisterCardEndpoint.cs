@@ -12,6 +12,7 @@ internal static class RegisterCardEndpoint
         endpoints.MapPost("/cards", HandleAsync)
             .RequireAuthorization()
             .WithName("RegisterCard")
+            .WithGroupName("public-v1")
             .WithTags("Cards");
 
     private static async Task<Results<Created<RegisterCardResponse>, BadRequest<Error>, ForbidHttpResult>> HandleAsync(
