@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.6.2" />
+    <PackageReference Include="Scalar.Aspire" Version="0.12.3" />
   </ItemGroup>
 
   <ItemGroup>

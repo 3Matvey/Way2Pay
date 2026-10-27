@@ -1,4 +1,6 @@
 using Way2Pay.AppHost.Infrastructure.Vault;
+using Scalar.Aspire;
+using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -27,5 +29,23 @@ builder.AddProject<Projects.Way2Pay_Gateway>("way2pay-gateway")
     .WithReference(cardVault)
     .WaitFor(paymentsApi)
     .WaitFor(cardVault);
+
+var scalar = builder.AddScalarApiReference(options =>
+{
+    options.PreferHttpsEndpoint();
+
+    if (builder.Environment.IsDevelopment())
+        options.AllowSelfSignedCertificates();
+});
+
+scalar
+    .WithApiReference(paymentsApi, configureOptions: options =>
+    {
+        options.AddDocument("public-v1", "Payments");
+    })
+    .WithApiReference(cardVault, configureOptions: options =>
+    {
+        options.AddDocument("public-v1", "Cards");
+    });
 
 builder.Build().Run();
