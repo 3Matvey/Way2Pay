@@ -1,4 +1,4 @@
-namespace Way2Pay.Payments.Application.Common.Interfaces;
+namespace Way2Pay.Payments.Application.Common;
 
 public interface IUnitOfWork
 {

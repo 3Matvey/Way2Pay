@@ -2,7 +2,10 @@
   <Folder Name="/CardVault/">
     <Project Path="src/CardVault/Way2Pay.CardVault/Way2Pay.CardVault.csproj" />
   </Folder>
-  <Folder Name="/Merchants/" />
+  <Folder Name="/Merchants/">
+    <Project Path="src/Merchants/Way2Pay.Merchants.Application/Way2Pay.Merchants.Application.csproj" Id="54142c08-00b3-4b30-9abd-16f7223c5960" />
+    <Project Path="src/Merchants/Way2Pay.Merchants.Domain/Way2Pay.Merchants.Domain.csproj" Id="21ad5b23-a1b1-4ba8-8fb2-3c2f8791d6a5" />
+  </Folder>
   <Folder Name="/Payments/">
     <Project Path="M:/Way2Pay/src/Payments/Way2Pay.Payments.Application/Way2Pay.Payments.Application.csproj" Id="d17ebb8b-3130-4957-bea8-b8d20b931339" />
     <Project Path="M:/Way2Pay/src/Payments/Way2Pay.Payments.Domain/Way2Pay.Payments.Domain.csproj" Id="ea5c3f52-b34c-41d5-9c47-7f1bda42ae9f" />

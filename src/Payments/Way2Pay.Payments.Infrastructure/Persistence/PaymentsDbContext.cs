@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Way2Pay.Payments.Application.Common.Interfaces;
+using Way2Pay.Payments.Application.Common;
 using Way2Pay.Payments.Domain.Payments;
 using Way2Pay.Payments.Domain.Payments.Attempts;
 using Way2Pay.Payments.Domain.Payments.Operations;

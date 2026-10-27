@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Way2Pay.Payments.Application.Common.Interfaces;
+using Way2Pay.Payments.Application.Common;
 
 namespace Way2Pay.Payments.Infrastructure.Persistence;
 
