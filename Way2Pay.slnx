@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/CardVault/">
     <Project Path="src/CardVault/Way2Pay.CardVault/Way2Pay.CardVault.csproj" />
   </Folder>
@@ -7,16 +7,17 @@
     <Project Path="src/Merchants/Way2Pay.Merchants.Domain/Way2Pay.Merchants.Domain.csproj" Id="21ad5b23-a1b1-4ba8-8fb2-3c2f8791d6a5" />
   </Folder>
   <Folder Name="/Payments/">
-    <Project Path="M:/Way2Pay/src/Payments/Way2Pay.Payments.Application/Way2Pay.Payments.Application.csproj" Id="d17ebb8b-3130-4957-bea8-b8d20b931339" />
-    <Project Path="M:/Way2Pay/src/Payments/Way2Pay.Payments.Domain/Way2Pay.Payments.Domain.csproj" Id="ea5c3f52-b34c-41d5-9c47-7f1bda42ae9f" />
-    <Project Path="M:/Way2Pay/src/Payments/Way2Pay.Payments.Infrastructure/Way2Pay.Payments.Infrastructure.csproj" Id="7c6b7ee3-b952-4099-b383-18d30aea7c6b" />
+    <Project Path="src/Payments/Way2Pay.Payments.Application/Way2Pay.Payments.Application.csproj" Id="d17ebb8b-3130-4957-bea8-b8d20b931339" />
+    <Project Path="src/Payments/Way2Pay.Payments.Domain/Way2Pay.Payments.Domain.csproj" Id="ea5c3f52-b34c-41d5-9c47-7f1bda42ae9f" />
+    <Project Path="src/Payments/Way2Pay.Payments.Infrastructure/Way2Pay.Payments.Infrastructure.csproj" Id="7c6b7ee3-b952-4099-b383-18d30aea7c6b" />
     <Project Path="src/Payments/Way2Pay.Payments.Api/Way2Pay.Payments.Api.csproj" />
   </Folder>
   <Folder Name="/Shared/">
-    <Project Path="M:/Way2Pay/src/Shared/Way2Pay.Common/Way2Pay.Common.csproj" Id="f00c77e2-cf6f-47ac-abac-3bedf499c1b5" />
-    <Project Path="M:/Way2Pay/src/Shared/Way2Pay.Routing.Contracts/Way2Pay.Routing.Contracts.csproj" Id="c8a61e39-5323-4444-bf51-6ab683742f24" />
+    <Project Path="src/Shared/Way2Pay.Common/Way2Pay.Common.csproj" Id="f00c77e2-cf6f-47ac-abac-3bedf499c1b5" />
+    <Project Path="src/Shared/Way2Pay.Routing.Contracts/Way2Pay.Routing.Contracts.csproj" Id="c8a61e39-5323-4444-bf51-6ab683742f24" />
   </Folder>
-  <Project Path="M:/Way2Pay/src/Way2Pay.AppHost/Way2Pay.AppHost.csproj" Id="f70f8728-7a77-4487-8914-5b17b091211d" />
-  <Project Path="M:/Way2Pay/src/Way2Pay.ServiceDefaults/Way2Pay.ServiceDefaults.csproj" />
+  <Project Path="src/Way2Pay.AppHost/Way2Pay.AppHost.csproj" Id="f70f8728-7a77-4487-8914-5b17b091211d" />
+  <Project Path="src/Way2Pay.ServiceDefaults/Way2Pay.ServiceDefaults.csproj" />
   <Project Path="src/Way2Pay.Gateway/Way2Pay.Gateway.csproj" />
 </Solution>
+
