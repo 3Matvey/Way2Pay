@@ -11,6 +11,7 @@ var sql = builder.AddSqlServer("sql", port: 14333)
 
 var paymentsDatabase = sql.AddDatabase("payments-db", "Way2Pay.Payments");
 var cardVaultDatabase = sql.AddDatabase("cardvault-db", "Way2Pay.CardVault");
+var merchantsDatabase = sql.AddDatabase("merchants-db", "Way2Pay.Merchants");
 
 var vault = builder.AddVault();
 
@@ -24,11 +25,17 @@ var cardVault = builder.AddProject<Projects.Way2Pay_CardVault>("way2pay-cardvaul
     .WithEnvironment("Vault__Address", vault.GetEndpoint("http"))
     .WaitFor(vault);
 
+var merchantsApi = builder.AddProject<Projects.Way2Pay_Merchants_Api>("way2pay-merchants-api")
+    .WithReference(merchantsDatabase)
+    .WaitFor(merchantsDatabase);
+
 builder.AddProject<Projects.Way2Pay_Gateway>("way2pay-gateway")
     .WithReference(paymentsApi)
     .WithReference(cardVault)
+    .WithReference(merchantsApi)
     .WaitFor(paymentsApi)
-    .WaitFor(cardVault);
+    .WaitFor(cardVault)
+    .WaitFor(merchantsApi);
 
 var scalar = builder.AddScalarApiReference(options =>
 {
@@ -47,5 +54,6 @@ scalar
     {
         options.AddDocument("public-v1", "Cards");
     });
+
 
 builder.Build().Run();

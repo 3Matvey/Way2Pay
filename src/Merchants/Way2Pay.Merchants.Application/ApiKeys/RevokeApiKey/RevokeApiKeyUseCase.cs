@@ -6,7 +6,9 @@ public sealed class RevokeApiKeyUseCase(
     IMerchantApiKeyRepository apiKeyRepository, IUnitOfWork unitOfWork, TimeProvider timeProvider) : IUseCase
 {
     /// <summary>Revokes a merchant-owned API key; repeated revocation succeeds without changing its original timestamp.</summary>
-    /// <remarks>The caller must be authorized for the requested merchant. Missing and foreign keys share one error.</remarks>
+    /// <remarks>
+    /// The caller must be authorized for the requested merchant. Missing and foreign keys share one error.
+    /// </remarks>
     public async Task<Result> ExecuteAsync(
         RevokeApiKeyRequest request, CancellationToken cancellationToken = default)
     {
