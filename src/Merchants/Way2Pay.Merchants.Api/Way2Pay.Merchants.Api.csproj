@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.85.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
       <PrivateAssets>all</PrivateAssets>
@@ -17,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Way2Pay.ServiceDefaults\Way2Pay.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Way2Pay.Merchants.Contracts\Way2Pay.Merchants.Contracts.csproj" />
     <ProjectReference Include="..\Way2Pay.Merchants.Infrastructure\Way2Pay.Merchants.Infrastructure.csproj" />
   </ItemGroup>
 

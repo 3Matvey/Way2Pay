@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.85.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
     <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.11.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.3" />
@@ -14,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Merchants\Way2Pay.Merchants.Contracts\Way2Pay.Merchants.Contracts.csproj" />
     <ProjectReference Include="..\Way2Pay.ServiceDefaults\Way2Pay.ServiceDefaults.csproj" />
   </ItemGroup>
 

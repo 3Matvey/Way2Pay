@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package way2pay.merchants.authentication.v1;
+
+option csharp_namespace = "Way2Pay.Merchants.Contracts.Protos.Authentication.V1";
+
+service MerchantAuthentication {
+  rpc ValidateApiKey (ValidateApiKeyRequest)
+      returns (ValidateApiKeyResponse);
+}
+
+message ValidateApiKeyRequest {
+  string api_key = 1;
+}
+
+message ValidateApiKeyResponse {
+  string merchant_id = 1;
+}
