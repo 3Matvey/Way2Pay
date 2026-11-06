@@ -12,6 +12,10 @@ internal static class PaymentAmountFactory
         {
             return new Money(amount, new CurrencyCode(currency));
         }
+        catch (ArgumentOutOfRangeException)
+        {
+            return PaymentErrors.InvalidAmount();
+        }
         catch (ArgumentException)
         {
             return PaymentErrors.InvalidCurrency();

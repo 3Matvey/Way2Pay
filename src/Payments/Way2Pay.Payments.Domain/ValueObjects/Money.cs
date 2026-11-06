@@ -2,14 +2,23 @@ namespace Way2Pay.Payments.Domain.ValueObjects;
 
 public sealed record Money
 {
-    public decimal Amount { get; }
+    public decimal Amount
+    { 
+        get;
+        private init
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "The amount cannot be negative.");
+            if (decimal.Round(value, 4) != value)
+                throw new ArgumentOutOfRangeException(nameof(value), "Amount must have at most four significant decimal places.");
+            field = value;
+        }
+    }
     public CurrencyCode Currency { get; }
 
     public Money(decimal amount, CurrencyCode currency)
     {
         ArgumentNullException.ThrowIfNull(currency);
-        if (amount < 0)
-            throw new ArgumentOutOfRangeException(nameof(amount), "The amount cannot be negative.");
 
         Amount = amount;
         Currency = currency;
