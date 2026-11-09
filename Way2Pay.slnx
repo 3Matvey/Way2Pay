@@ -25,7 +25,10 @@
     <Project Path="src/Shared/Way2Pay.Routing.Contracts/Way2Pay.Routing.Contracts.csproj" Id="c8a61e39-5323-4444-bf51-6ab683742f24" />
   </Folder>
   <Folder Name="/tests/" />
-  <Folder Name="/tests/CardVault/" />
+  <Folder Name="/tests/CardVault/">
+    <Project Path="tests/CardVault/Way2Pay.CardVault.IntegrationTests/Way2Pay.CardVault.IntegrationTests.csproj" Id="61ee9d5d-182d-4c9c-bd43-fe1893228b18" />
+    <Project Path="tests/CardVault/Way2Pay.CardVault.Tests/Way2Pay.CardVault.Tests.csproj" Id="6908e24e-32ab-4122-902f-94b2eca73b32" />
+  </Folder>
   <Folder Name="/tests/Integration/" />
   <Folder Name="/tests/Merchants/" />
   <Folder Name="/tests/Payments/">
