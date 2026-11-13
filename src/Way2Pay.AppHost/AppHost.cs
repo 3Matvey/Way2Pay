@@ -37,6 +37,27 @@ builder.AddProject<Projects.Way2Pay_Gateway>("way2pay-gateway")
     .WaitFor(cardVault)
     .WaitFor(merchantsApi);
 
+#region Migrations
+
+if (builder.Environment.IsDevelopment())
+{
+    var cardVaultMigrations = cardVault.AddEFMigrations("cardvault-migrations")
+        .RunDatabaseUpdateOnStart();
+    cardVault.WaitForCompletion(cardVaultMigrations);
+
+    var merchantsMigrations = merchantsApi.AddEFMigrations("merchants-migrations")
+        .WithMigrationsProject<Projects.Way2Pay_Merchants_Infrastructure>()
+        .RunDatabaseUpdateOnStart();
+    merchantsApi.WaitForCompletion(merchantsMigrations);
+
+    var paymentsMigrations = paymentsApi.AddEFMigrations("payments-migrations")
+        .WithMigrationsProject<Projects.Way2Pay_Payments_Infrastructure>()
+        .RunDatabaseUpdateOnStart();
+    paymentsApi.WaitForCompletion(paymentsMigrations);
+}
+
+#endregion
+
 var scalar = builder.AddScalarApiReference(options =>
 {
     options.PreferHttpsEndpoint();
@@ -53,7 +74,10 @@ scalar
     .WithApiReference(cardVault, configureOptions: options =>
     {
         options.AddDocument("public-v1", "Cards");
+    })
+    .WithApiReference(merchantsApi, configureOptions: options =>
+    {
+        options.AddDocument("admin-v1", "Merchants Admin");
     });
-
 
 builder.Build().Run();

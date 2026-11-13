@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.EntityFrameworkCore" Version="13.6.5-preview.1.26559.7" />
     <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.6.5" />
     <PackageReference Include="Scalar.Aspire" Version="0.13.0" />
   </ItemGroup>
@@ -17,7 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\CardVault\Way2Pay.CardVault\Way2Pay.CardVault.csproj" />
     <ProjectReference Include="..\Merchants\Way2Pay.Merchants.Api\Way2Pay.Merchants.Api.csproj" />
+    <ProjectReference Include="..\Merchants\Way2Pay.Merchants.Infrastructure\Way2Pay.Merchants.Infrastructure.csproj" />
     <ProjectReference Include="..\Payments\Way2Pay.Payments.Api\Way2Pay.Payments.Api.csproj" />
+    <ProjectReference Include="..\Payments\Way2Pay.Payments.Infrastructure\Way2Pay.Payments.Infrastructure.csproj" />
     <ProjectReference Include="..\Way2Pay.Gateway\Way2Pay.Gateway.csproj" />
   </ItemGroup>
 

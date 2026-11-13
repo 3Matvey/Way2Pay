@@ -1,5 +1,6 @@
 using Way2Pay.CardVault.Authentication;
 using Way2Pay.CardVault.CardRegistrationSessions;
+using Way2Pay.CardVault.CardRegistrationSessions.CreateCardRegistrationSession;
 using Way2Pay.CardVault.Cards.RegisterCard;
 using Way2Pay.CardVault.Errors;
 using Way2Pay.CardVault.Persistence;
@@ -48,5 +49,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRegisterCard();
+app.MapCreateCardRegistrationSession();
 
 app.Run();

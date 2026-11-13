@@ -10,9 +10,13 @@ internal sealed class CardRegistrationOpenApiTransformer : IOpenApiOperationTran
     public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context,
         CancellationToken cancellationToken)
     {
-        if (!context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>()
-            .Any(metadata => metadata.Policy == CardRegistrationAuthentication.Policy))
+        if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>()
+            .All(metadata => metadata.Policy != CardRegistrationAuthentication.Policy))
             return Task.CompletedTask;
+        
+        if (context.Document is null) 
+            throw new InvalidOperationException($"{nameof(context.Document)} cannot be null.");
+        
         AddSecurityScheme(context.Document);
         operation.Security ??= [];
         operation.Security.Add(new OpenApiSecurityRequirement

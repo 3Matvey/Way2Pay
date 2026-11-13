@@ -24,5 +24,10 @@ app.MapScalarApiReference(options => options
     .AddDocument("payments", "Payments", "/openapi/payments.json", isDefault: true)
     .AddDocument("cards", "Cards", "/openapi/cards.json")
     .DisableAgent());
+app.MapScalarApiReference("/scalar/admin", options => options
+    .WithTitle("Way2Pay Merchant Administration API")
+    .AddDocument("merchants-admin", "Merchants Admin", "/openapi/merchants-admin.json")
+    .HideTestRequestButton()
+    .DisableAgent());
 
 app.Run();
