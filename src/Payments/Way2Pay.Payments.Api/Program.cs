@@ -1,8 +1,16 @@
+using Way2Pay.Payments.Api.Authentication;
+using Way2Pay.Payments.Api.Endpoints;
+using Way2Pay.Payments.Application.Payments;
+using Way2Pay.Payments.Application.Payments.CreatePayment;
 using Way2Pay.Payments.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<GatewayMerchantAccess>();
+builder.Services.AddScoped<IMerchantPaymentAccess>(services => services.GetRequiredService<GatewayMerchantAccess>());
+builder.Services.AddScoped<CreatePaymentUseCase>();
 
 builder.Services.AddOpenApi("public-v1", options =>
 {
@@ -25,6 +33,7 @@ var app = builder.Build();
 app.MapDefaultEndpoints();
 
 app.MapOpenApi();
+app.MapCreatePayment();
 
 app.UseHttpsRedirection();
 

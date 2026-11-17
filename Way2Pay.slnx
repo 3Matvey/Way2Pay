@@ -32,6 +32,7 @@
   <Folder Name="/tests/Integration/" />
   <Folder Name="/tests/Merchants/" />
   <Folder Name="/tests/Payments/">
+    <Project Path="tests/Payments/Way2Pay.Payments.IntegrationTests/Way2Pay.Payments.IntegrationTests.csproj" />
     <Project Path="tests/Payments/Way2Pay.Payments.Application.Tests/Way2Pay.Payments.Application.Tests.csproj" Id="09fe0cc5-158d-4af6-ac66-cec056a6bd3f" />
     <Project Path="tests/Payments/Way2Pay.Payments.Domain.Tests/Way2Pay.Payments.Domain.Tests.csproj" Id="d96d6fda-e59c-4db1-bb16-8c20d29ee4fa" />
   </Folder>
