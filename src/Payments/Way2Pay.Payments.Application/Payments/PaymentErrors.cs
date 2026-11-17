@@ -20,6 +20,9 @@ public static class PaymentErrors
     public static Error InvalidIdempotencyKey() =>
         Error.BadRequest("Payments.InvalidIdempotencyKey", "An idempotency key is required.");
 
+    public static Error InvalidCreationIdempotencyKey() =>
+        Error.BadRequest("Payments.InvalidIdempotencyKey", "The idempotency key must be non-blank and at most 255 UTF-16 code units.");
+
     public static Error IdempotencyConflict() =>
         Error.Conflict("Payments.IdempotencyConflict", "The idempotency key was already used with different payment parameters.");
 

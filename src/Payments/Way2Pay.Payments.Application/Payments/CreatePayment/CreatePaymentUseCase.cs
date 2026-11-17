@@ -25,8 +25,8 @@ public sealed class CreatePaymentUseCase(
     {
         if (request.MerchantId == Guid.Empty)
             return PaymentErrors.InvalidMerchantId();
-        if (string.IsNullOrWhiteSpace(request.IdempotencyKey))
-            return PaymentErrors.InvalidIdempotencyKey();
+        if (string.IsNullOrWhiteSpace(request.IdempotencyKey) || request.IdempotencyKey.Length > 255)
+            return PaymentErrors.InvalidCreationIdempotencyKey();
         if (request.PaymentMethod is null)
             return PaymentErrors.InvalidPaymentMethod();
         return PaymentAmountFactory.Create(request.Amount, request.Currency);
